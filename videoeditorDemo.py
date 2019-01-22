@@ -10,10 +10,12 @@ import time
 import datetime
 from tkinter import filedialog
 import os
+from datetime import datetime
 #####Added to solve %1
 from moviepy.config import change_settings
 
-now = time.strftime("%Y%m%d-%H%M%S")
+current_milli_time = lambda: int(round(time.time() * 1000))
+now = str(current_milli_time())
 print (now)
 
 tqdm(disable=True, total=0)  # initialise internal lock
@@ -30,6 +32,7 @@ maxHeight   = 1000
 playpause = True
 file_name = 'None'
 s = ''
+cont = 0
 
 i = 0
 j = 0
@@ -89,16 +92,44 @@ def load_videos(video_file):
       print('Pause')
 
   tqdm(disable=True, total=0)
+
+  def add_button():
+    global i
+    global j
+    global y_val
+    global dicti
+    i = i + 1
+
+    global s
+    s = textBox.get("1.0","end-1c")
+    subpath = file_name.split('/')
+    subpath = subpath[:-1]
+    subpath = '/'.join(subpath)
+    subpath = str(subpath +'/'+str(s))
+    if not os.path.exists(subpath):
+      os.mkdir(subpath)
+
+    newButton = Button(mainWindow, text=s, font = fontButtons, bg = white, width = 20, height= 1, command = lambda i=i: my_app.combined_function(i,i)) 
+
+    newButton.place(x=int(button_pos_x[int((j)%3)]),y= y_val)
+    button_id = i
+    dicti[button_id] = s
+    print('In fuction',dicti)
+    j+=1
+
+    if(i % 3 == 0):
+      y_val+= 100
+
   class my_app(Frame):
 
     def __init__(self, master):
       Frame.__init__(self,master)
-      self.grid()
+      self.pack()
     
-    def combined_function(self, b_id): #This is one of the areas where I need help. I want this to return the number of the button clicked.
-
-      self.b_id = b_id
-      print( self.b_id) #Print Button ID
+    def combined_function(self, b_id):
+      global cont
+      b_id = b_id
+      print(b_id) #Print Button ID
       
       gd=0
       print("Position : %d" % cap.get(cv2.CAP_PROP_POS_MSEC))
@@ -112,39 +143,13 @@ def load_videos(video_file):
       subpath = subpath[:-1]
       subpath = '/'.join(subpath)
       print("DICTIONARY",dicti[b_id])
-      path = str(str(subpath)+"/"+str(dicti[b_id])+"/"+"editted_test_"+str(s)+now+"_.mp4")
+
+
+      path = str(str(subpath)+"/"+str(dicti[b_id])+"/"+"editted_test_"+str(dicti[b_id])+now+"_"+str(cont)+"_.mp4")
       exportedvideo.write_videofile(path,fps=25) # Final Result on the video
+      cont +=1
 
-
-    def add_button(self):
-      global i
-      global j
-      global y_val
-      global dicti
-
-      i = i + 1
-
-      global s
-      s = textBox.get("1.0","end-1c")
-
-      subpath = file_name.split('/')
-      subpath = subpath[:-1]
-      subpath = '/'.join(subpath)
-      subpath = str(subpath +'/'+str(s))
-      if not os.path.exists(subpath):
-        os.mkdir(subpath)
-
-      self.newButton = Button(self, text=s, font = fontButtons, bg = white, width = 20, height= 1, command = lambda i=i: self.combined_function(i)) 
-
-      self.newButton.pack()
-      button_id = i
-      dicti[button_id] = s
-      print('In fuction',dicti)
-      j+=1
-
-      if(i % 3 == 0):
-        y_val+= 100
-
+    
   
   # def TrimVideo():
   #     gd=0
@@ -221,6 +226,6 @@ def load_videos(video_file):
   textBox.place(x=350,y=550)
 
   app = my_app(mainWindow)
-  main_button = Button(mainWindow,text="Submit",command=lambda:app.add_button()).place(x=370,y=580)
+  main_button = Button(mainWindow,text="Submit",command=lambda:add_button()).place(x=370,y=580)
 
 mainWindow.mainloop()  #Starts GUI
