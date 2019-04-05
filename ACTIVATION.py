@@ -50,7 +50,7 @@ def Generate_Key():
 def check_activation():
     global activate
     print(entry_1.get())
-    r = requests.post("http://13.233.82.78:8000/activation/",data = {'key':entry_1.get(),'mac_address':GetUUID(), 'ip':GetUUID(), 'cpu_id':GetUUID()})
+    r = requests.post("http://13.233.82.78:8000/activation/",data = {'key':entry_1.get(),'computerID':GetUUID()})
     a = (r.text)
     df = pd.DataFrame(np.array([[a[a.find('Licence'):a.find('Licence')+17], a[a.find('licence_number')+16:a.find('licence_number')+17], a[a.find('expiry_date')+14:a.find('expiry_date')+24]]]),columns=['Detail', 'Licence_number', 'Expiry_date'])
     print(a)
@@ -70,9 +70,6 @@ def check_activation():
         print('You are allowed to use the software')
         print('Software',str(a) )
         activate = True
-        f = open("./CHECK","w")
-        f.write("ACTIVATED")
-        f.close()
         # TRIGGER = True
         # if TRIGGER == True:
         #     import VideoEditor_FINAL

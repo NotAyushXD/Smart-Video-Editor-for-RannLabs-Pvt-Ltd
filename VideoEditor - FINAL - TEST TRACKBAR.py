@@ -38,12 +38,21 @@ import matplotlib.ticker as plticker
 
 try:
 
+
     from PIL import Image
 
 except ImportError:
 
     import Image
 
+def getFrame(frame_nr):
+    global video
+    video.set(cv2.CAP_PROP_POS_FRAMES, frame_nr)
+
+#  function called by trackbar, sets the speed of playback
+def setSpeed(val):
+    global playSpeed
+    playSpeed = max(val,1)
 
 
 def draw_grid(img, line_color=(0, 0, 0), thickness=1, type_=cv2.LINE_AA, pxstep=220):
@@ -138,12 +147,12 @@ def popupmsg(msg):
 
 def browse_file():
   global file_name
-  try:
-    file_name = filedialog.askopenfilename()
-    print(file_name)
-    load_videos(file_name)
-  except:
-    popupmsg('File was not able to load')
+  # try:
+  file_name = filedialog.askopenfilename()
+  print(file_name)
+  load_videos(file_name)
+  # except:
+    # popupmsg('File was not able to load')
 
 #Graphics window
 
@@ -195,22 +204,23 @@ def draw_circle(event,x,y,flags,param):
 
 
 def load_videos(video_file):
-
+  global nr_of_frames, playSpeed
   def show_frame():
-
     global draw
 
 
     if playpause == True and grids == False:
       ret, frame = cap.read()
-
-
+      global nr_of_frames, playSpeed
+      cv2.setTrackbarPos("frame","Video", int(cap.get(cv2.CAP_PROP_POS_FRAMES)))
       cv2image   = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
       img   = Image.fromarray(cv2image).resize((760, 400))
       imgtk = ImageTk.PhotoImage(image = img)
       lmain.imgtk = imgtk
       lmain.configure(image=imgtk)
       lmain.after(10, show_frame)
+      cv2.createTrackbar("Frame", "Video", 0,nr_of_frames,getFrame)
+      cv2.createTrackbar("Speed", "Video", playSpeed,100,setSpeed)
       # c = cap.get(cv2.CAP_PROP_POS_MSEC)
       # x = c//1000
       # m, s = divmod(x, 60)
@@ -442,6 +452,11 @@ def load_videos(video_file):
 
 
   cap = cv2.VideoCapture(file_name)
+  nr_of_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+  playSpeed = 50
+
+
 
   print("Position : %d" % cap.get(cv2.CAP_PROP_POS_MSEC))
 

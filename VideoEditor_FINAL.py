@@ -1,4 +1,3 @@
-# C:\Users\ayush\AppData\Local\Programs\Python\Python37-32\Videoeditor - CLIENT
 import cv2
 import tkinter as tk
 from tkinter import *
@@ -23,18 +22,8 @@ try:
 except ImportError:
     import Image
 
-try:
-	f = open("./CHECK","r")
-	a = f.readlines()
 
-	for i in a:
-		if i !="ACTIVATED":
-			import ACTIVATION
-
-	f.close()
-except:
-	import ACTIVATION
-
+import ACTIVATION
 def draw_grid(img, line_color=(0, 0, 0), thickness=1, type_=cv2.LINE_AA, pxstep=220):
     x = pxstep
     y = pxstep
